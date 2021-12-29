@@ -1,0 +1,8 @@
+version: "3"
+services:
+  mancala-ui:
+     image: mancala-ui
+     container_name: mancala-ui-container
+     ports:
+       - 3000:3000
+     tty: true
