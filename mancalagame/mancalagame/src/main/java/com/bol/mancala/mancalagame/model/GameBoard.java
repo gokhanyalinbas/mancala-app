@@ -29,12 +29,12 @@ public class GameBoard {
     public HashMap getAllScoreBoard() {
         //PlayerA score
         scoreBoard.put(Turn.PlayerA, getPits().stream()
-                .filter(pit -> pit.getId() < MancalaConst.PLAYER_A_PIT_HOUSE)
+                .filter(pit -> pit.getId() < MancalaConst.PLAYER_A_PIT_BIG_PIT)
                 .mapToInt(Pit::getStoneCount).sum());
         //PlayerB score
         scoreBoard.put(Turn.PlayerB, getPits().stream()
-                .filter(pit -> pit.getId() < MancalaConst.PLAYER_B_PIT_HOUSE)
-                .filter(pit -> pit.getId() > MancalaConst.PLAYER_A_PIT_HOUSE)
+                .filter(pit -> pit.getId() < MancalaConst.PLAYER_B_PIT_BIG_PIT)
+                .filter(pit -> pit.getId() > MancalaConst.PLAYER_A_PIT_BIG_PIT)
                 .mapToInt(Pit::getStoneCount).sum());
 
         return scoreBoard;

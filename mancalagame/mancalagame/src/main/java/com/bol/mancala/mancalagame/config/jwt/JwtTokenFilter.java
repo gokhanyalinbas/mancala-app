@@ -1,6 +1,8 @@
 package com.bol.mancala.mancalagame.config.jwt;
 
+import com.bol.mancala.mancalagame.exception.LoginSessionExpiredException;
 import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.Jwts;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -35,19 +37,25 @@ public class JwtTokenFilter extends GenericFilterBean {
             throws IOException, ServletException {
         System.err.println("doFilter()");
         String headerValue = ((HttpServletRequest) req).getHeader("Authorization");
+        try {
+            getBearerToken(headerValue).ifPresent(token -> {
+                String username = getClaimFromToken(token, Claims::getSubject);
+                UserDetails userDetails = userDetailsService.loadUserByUsername(username);
 
-        getBearerToken(headerValue).ifPresent(token -> {
-            String username = getClaimFromToken(token, Claims::getSubject);
-            UserDetails userDetails = userDetailsService.loadUserByUsername(username);
 
-            if (username.equals(userDetails.getUsername()) && !isJwtExpired(token)) {
-                UsernamePasswordAuthenticationToken usernamePasswordAuthenticationToken =
-                        new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
-                usernamePasswordAuthenticationToken.setDetails(
-                        new WebAuthenticationDetailsSource().buildDetails((HttpServletRequest) req));
-                SecurityContextHolder.getContext().setAuthentication(usernamePasswordAuthenticationToken);
-            }
-        });
+                if (username.equals(userDetails.getUsername()) && !isJwtExpired(token)) {
+                    UsernamePasswordAuthenticationToken usernamePasswordAuthenticationToken =
+                            new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
+                    usernamePasswordAuthenticationToken.setDetails(
+                            new WebAuthenticationDetailsSource().buildDetails((HttpServletRequest) req));
+                    SecurityContextHolder.getContext().setAuthentication(usernamePasswordAuthenticationToken);
+                }
+            });
+
+        } catch (ExpiredJwtException ex) {
+            System.err.println(ex.getMessage());
+            throw new LoginSessionExpiredException("Session is expired. Please try to login again ! ");
+        }
 
         filterChain.doFilter(req, res);
     }
@@ -64,7 +72,7 @@ public class JwtTokenFilter extends GenericFilterBean {
         return claimsResolver.apply(claims);
     }
 
-    private Boolean isJwtExpired(String token) {
+    private Boolean isJwtExpired(String token) throws ExpiredJwtException {
         Date expirationDate = getClaimFromToken(token, Claims::getExpiration);
         return expirationDate.before(new Date());
     }

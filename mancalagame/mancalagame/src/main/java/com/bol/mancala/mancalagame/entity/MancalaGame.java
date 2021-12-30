@@ -5,7 +5,9 @@ import com.bol.mancala.mancalagame.model.GameBoard;
 import com.bol.mancala.mancalagame.model.Pit;
 import com.bol.mancala.mancalagame.model.Player;
 import com.bol.mancala.mancalagame.model.Turn;
-import lombok.*;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
@@ -16,8 +18,6 @@ import java.util.stream.IntStream;
 @Getter
 @Setter
 @Document(collection = "games")
-@Builder
-@AllArgsConstructor
 @NoArgsConstructor
 public class MancalaGame {
 

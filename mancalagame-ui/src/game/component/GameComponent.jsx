@@ -88,9 +88,9 @@ class GameComponent extends Component {
 
         let gameDto={
             pitId:id,
-            gameId:this.state.game.id
+            gameId:this.state.gameId
         }
-        GameService.playGame(id,this.state.game.id)
+        GameService.playGame(gameDto)
             .then(
                 response => {
                     console.log(response);

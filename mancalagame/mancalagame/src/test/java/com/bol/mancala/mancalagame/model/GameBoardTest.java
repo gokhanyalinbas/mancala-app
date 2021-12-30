@@ -54,11 +54,11 @@ class GameBoardTest {
     }
 
     @Test
-    @DisplayName("Is house ?")
-    void isHouse() {
-        assertEquals(true, gameBoard.getPit(7).isHouse());
-        assertEquals(true, gameBoard.getPit(14).isHouse());
-        assertEquals(false, gameBoard.getPit(5).isHouse());
+    @DisplayName("Is big pit ?")
+    void isBigpit() {
+        assertEquals(true, gameBoard.getPit(7).isBigPit());
+        assertEquals(true, gameBoard.getPit(14).isBigPit());
+        assertEquals(false, gameBoard.getPit(5).isBigPit());
 
     }
 

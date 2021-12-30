@@ -3,19 +3,17 @@ package com.bol.mancala.mancalagame.model;
 import com.bol.mancala.mancalagame.constant.MancalaConst;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 @Getter
 @Setter
-@NoArgsConstructor
 public class Pit {
     private int id;
     private int stoneCount;
 
     public Pit(int id, int stoneCount) {
         this.id = id;
-        if (isHouse())
+        if (isBigPit())
             this.stoneCount = MancalaConst.EMPTY_STONE;
         else
             this.stoneCount = stoneCount;
@@ -23,14 +21,14 @@ public class Pit {
     }
 
     @JsonIgnore
-    public boolean isHouse() {
-        return (this.getId() == MancalaConst.PLAYER_B_PIT_HOUSE)
-                || (this.getId() == MancalaConst.PLAYER_A_PIT_HOUSE);
+    public boolean isBigPit() {
+        return (this.getId() == MancalaConst.PLAYER_B_PIT_BIG_PIT)
+                || (this.getId() == MancalaConst.PLAYER_A_PIT_BIG_PIT);
     }
 
     @JsonIgnore
     public Turn getCurrentTurn() {
-        if (this.getId() <= MancalaConst.PLAYER_A_PIT_HOUSE)
+        if (this.getId() <= MancalaConst.PLAYER_A_PIT_BIG_PIT)
             return Turn.PlayerA;
         return Turn.PlayerB;
     }

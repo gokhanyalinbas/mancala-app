@@ -1,12 +1,12 @@
 package com.bol.mancala.mancalagame.exception;
 
 import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.Getter;
+import lombok.Setter;
 
 @AllArgsConstructor
-@NoArgsConstructor
-@Data
+@Getter
+@Setter
 public class ExceptionResponse {
     private String status;
     private String reason;

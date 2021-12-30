@@ -72,12 +72,7 @@ class GameEngineServiceImplTest {
     @Test
     @DisplayName("Get winner for PlayerA")
     void decideToWinnerForPlayerA() {
-        gameResponseDto.getGameBoard().getPits().get(0).setStoneCount(0);
-        gameResponseDto.getGameBoard().getPits().get(1).setStoneCount(0);
-        gameResponseDto.getGameBoard().getPits().get(2).setStoneCount(0);
-        gameResponseDto.getGameBoard().getPits().get(3).setStoneCount(0);
-        gameResponseDto.getGameBoard().getPits().get(4).setStoneCount(0);
-        gameResponseDto.getGameBoard().getPits().get(5).setStoneCount(1);
+        setGameBoardForTest();
         gameResponseDto.getGameBoard().getPits().get(6).setStoneCount(Integer.MAX_VALUE - 1);
 
         updatedGameResponseDto.setWinner(mancalaGame.getPlayerA());
@@ -92,12 +87,7 @@ class GameEngineServiceImplTest {
     @Test
     @DisplayName("Get winner for PlayerB")
     void decideToWinnerForPlayerB() {
-        gameResponseDto.getGameBoard().getPits().get(0).setStoneCount(0);
-        gameResponseDto.getGameBoard().getPits().get(1).setStoneCount(0);
-        gameResponseDto.getGameBoard().getPits().get(2).setStoneCount(0);
-        gameResponseDto.getGameBoard().getPits().get(3).setStoneCount(0);
-        gameResponseDto.getGameBoard().getPits().get(4).setStoneCount(0);
-        gameResponseDto.getGameBoard().getPits().get(5).setStoneCount(1);
+        setGameBoardForTest();
         gameResponseDto.getGameBoard().getPits().get(13).setStoneCount(Integer.MAX_VALUE - 50);
 
         updatedGameResponseDto.setWinner(mancalaGame.getPlayerB());
@@ -107,6 +97,15 @@ class GameEngineServiceImplTest {
         GameResponseDto play = gameEngineService.play(playGameRequestDto);
         assertThat(play.getWinner().getId()).isEqualTo(updatedGameResponseDto.getWinner().getId());
         assertThat(play.getWinner().getName()).isEqualTo(updatedGameResponseDto.getWinner().getName());
+    }
+
+    private void setGameBoardForTest() {
+        gameResponseDto.getGameBoard().getPits().get(0).setStoneCount(0);
+        gameResponseDto.getGameBoard().getPits().get(1).setStoneCount(0);
+        gameResponseDto.getGameBoard().getPits().get(2).setStoneCount(0);
+        gameResponseDto.getGameBoard().getPits().get(3).setStoneCount(0);
+        gameResponseDto.getGameBoard().getPits().get(4).setStoneCount(0);
+        gameResponseDto.getGameBoard().getPits().get(5).setStoneCount(1);
     }
 
     @Test
@@ -126,8 +125,8 @@ class GameEngineServiceImplTest {
     }
 
     @Test
-    @DisplayName("Next Turn For playerA - housePit")
-    void nextTurnForPlayerAHousePit() {
+    @DisplayName("Next Turn For playerA - big pit")
+    void nextTurnForPlayerABigPit() {
         gameResponseDto.getGameBoard().getPits().get(5).setStoneCount(1);
 
         updatedGameResponseDto.setTurn(Turn.PlayerA);
@@ -140,8 +139,8 @@ class GameEngineServiceImplTest {
     }
 
     @Test
-    @DisplayName("Next Turn For playerB - housePit")
-    void nextTurnForPlayerBHousePit() {
+    @DisplayName("Next Turn For playerB - Big Pit")
+    void nextTurnForPlayerBBigPit() {
         gameResponseDto.getGameBoard().getPits().get(12).setStoneCount(1);
 
         updatedGameResponseDto.setTurn(Turn.PlayerB);
@@ -155,8 +154,8 @@ class GameEngineServiceImplTest {
     }
 
     @Test
-    @DisplayName("Next Turn For playerB - without housePit")
-    void nextTurnForPlayerBWithoutHousePit() {
+    @DisplayName("Next Turn For playerB - without Big Pit")
+    void nextTurnForPlayerBWithoutBigPit() {
         gameResponseDto.getGameBoard().getPits().get(5).setStoneCount(3);
 
         updatedGameResponseDto.setTurn(Turn.PlayerB);
@@ -170,8 +169,8 @@ class GameEngineServiceImplTest {
     }
 
     @Test
-    @DisplayName("Next Turn For playerA - without housePit")
-    void nextTurnForPlayerAWithoutHousePit() {
+    @DisplayName("Next Turn For playerA - without Big Pit")
+    void nextTurnForPlayerAWithoutBigPit() {
         gameResponseDto.getGameBoard().getPits().get(12).setStoneCount(3);
 
         updatedGameResponseDto.setTurn(Turn.PlayerA);
@@ -213,8 +212,8 @@ class GameEngineServiceImplTest {
     }
 
     @Test
-    @DisplayName("UnexpectedMove Error -HousePit move")
-    void unexpectedMoveForHousePit() {
+    @DisplayName("UnexpectedMove Error -Big pit move")
+    void unexpectedMoveForBigPit() {
         gameResponseDto.setTurn(Turn.PlayerA);
         when(mancalaGameRepositoryService.findGame(any(String.class))).thenReturn(gameResponseDto);
         playGameRequestDto.setPitId(7);
@@ -222,7 +221,7 @@ class GameEngineServiceImplTest {
             gameEngineService.play(playGameRequestDto);
         });
 
-        assertThat(exception).hasMessageContaining("house").isInstanceOf(UnexpectedMoveException.class);
+        assertThat(exception).hasMessageContaining("big pit").isInstanceOf(UnexpectedMoveException.class);
     }
 
     @Test

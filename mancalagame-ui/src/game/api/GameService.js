@@ -20,8 +20,8 @@ class GameService {
         return instance.post(`${API_URL}/games/create`, gameDTO);
     }
      
-    playGame(pitId,gameId) {
-        console.log('executed service',pitId,gameId)
+    playGame(gameDTO) {
+        console.log('executed service',gameDTO)
         let token = sessionStorage.getItem('token');
         let config={
             headers:{
@@ -32,7 +32,7 @@ class GameService {
       const instance= axios.create()
       instance.defaults.headers.common['Authorization'] = token
       console.log('token',instance.defaults.headers.common)
-      return instance.put(`${API_URL}/games/play/${gameId}/pit/${pitId}`);
+      return instance.put(`${API_URL}/games/play`,gameDTO);
     }
     resume(id) {
         console.log('executed service',id)

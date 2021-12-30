@@ -1,16 +1,15 @@
 package com.bol.mancala.mancalagame.exception.handler;
 
 import com.bol.mancala.mancalagame.exception.ExceptionResponse;
+import com.bol.mancala.mancalagame.exception.LoginSessionExpiredException;
 import com.bol.mancala.mancalagame.exception.MancalaGameNotFoundException;
 import com.bol.mancala.mancalagame.exception.UnexpectedMoveException;
-import io.jsonwebtoken.ExpiredJwtException;
 import org.springframework.http.HttpStatus;
 import org.springframework.validation.ObjectError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
-import org.springframework.web.client.HttpServerErrorException;
 
 import javax.naming.AuthenticationException;
 import javax.validation.ConstraintViolation;
@@ -34,18 +33,18 @@ public class MancalaGameExceptionHandler {
         return new ExceptionResponse("BAD_REQUEST", ex.getMessage());
     }
 
-    @ExceptionHandler(HttpServerErrorException.InternalServerError.class)
-    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
-    public final ExceptionResponse handleInternalServerError(Exception ex) {
-        System.err.println(ex.getClass().getSimpleName() + ": " + ex.getMessage());
-        return new ExceptionResponse("INTERNAL_SERVER_ERROR", ex.getMessage());
-    }
-
     @ExceptionHandler(AuthenticationException.class)
     @ResponseStatus(HttpStatus.UNAUTHORIZED)
     public final ExceptionResponse handleAuthenticationException(Exception ex) {
         System.err.println(ex.getClass().getSimpleName() + ": " + ex.getMessage());
         return new ExceptionResponse("LOGIN_ERROR", ex.getMessage());
+    }
+
+    @ExceptionHandler(LoginSessionExpiredException.class)
+    @ResponseStatus(HttpStatus.UNAUTHORIZED)
+    public final ExceptionResponse handleLoginSessionExpiredException(Exception ex) {
+        System.err.println(ex.getClass().getSimpleName() + ": " + ex.getMessage());
+        return new ExceptionResponse("SESSION_EXPIRED", ex.getMessage());
     }
 
     @ExceptionHandler(Exception.class)
@@ -55,12 +54,6 @@ public class MancalaGameExceptionHandler {
         return new ExceptionResponse("INTERNAL_SERVER_ERROR", ex.getMessage());
     }
 
-    @ExceptionHandler(ExpiredJwtException.class)
-    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
-    public ExceptionResponse handleExpiredJwtException(Exception ex) {
-        System.err.println(ex.getClass().getSimpleName() + ": " + ex.getMessage());
-        return new ExceptionResponse("INTERNAL_SERVER_ERROR", ex.getMessage());
-    }
 
     @ExceptionHandler(ConstraintViolationException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)

@@ -2,6 +2,7 @@ package com.bol.mancala.mancalagame.controller;
 
 import com.bol.mancala.mancalagame.constant.MancalaConst;
 import com.bol.mancala.mancalagame.dto.*;
+import com.bol.mancala.mancalagame.exception.LoginSessionExpiredException;
 import com.bol.mancala.mancalagame.exception.MancalaGameNotFoundException;
 import com.bol.mancala.mancalagame.exception.UnexpectedMoveException;
 import com.bol.mancala.mancalagame.model.Pit;
@@ -21,11 +22,15 @@ import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 
+import javax.naming.AuthenticationException;
+import javax.validation.ConstraintViolationException;
 import java.util.HashMap;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.BDDMockito.given;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
@@ -37,11 +42,14 @@ class GameControllerTest {
     MancalaGameRepositoryServiceImpl mancalaGameRepositoryService;
     CreateGameRequestDto gameRequestDto;
     GameResponseDto gameResponseDto;
+    PlayGameRequestDto playGameRequestDto;
     @Autowired
     private MockMvc mockMvc;
 
+
     @BeforeEach
     void setUp() {
+        playGameRequestDto = new PlayGameRequestDto(5, "12");
         gameRequestDto = new CreateGameRequestDto(new Player("1", "PlayerA"), new Player("2", "PlayerB"));
         gameResponseDto = GameResponseDto.builder()
                 .turn(Turn.PlayerA)
@@ -146,7 +154,8 @@ class GameControllerTest {
         when(gameEngineService.play(any(PlayGameRequestDto.class))).thenReturn(gameResponseDto);
 
         mockMvc.perform(
-                        MockMvcRequestBuilders.put("/" + MancalaConst.REQUEST_MAPPING + MancalaConst.PLAY, "12", 5)
+                        MockMvcRequestBuilders.put("/" + MancalaConst.REQUEST_MAPPING + MancalaConst.PLAY)
+                                .content(new ObjectMapper().writeValueAsString(playGameRequestDto))
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .accept(MediaType.APPLICATION_JSON)
                 )
@@ -163,13 +172,33 @@ class GameControllerTest {
         when(gameEngineService.play(any(PlayGameRequestDto.class))).thenThrow(new MancalaGameNotFoundException("not found"));
 
         mockMvc.perform(
-                        MockMvcRequestBuilders.put("/" + MancalaConst.REQUEST_MAPPING + MancalaConst.PLAY, "12", 5)
+                        MockMvcRequestBuilders.put("/" + MancalaConst.REQUEST_MAPPING + MancalaConst.PLAY)
+                                .content(new ObjectMapper().writeValueAsString(playGameRequestDto))
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .accept(MediaType.APPLICATION_JSON)
                 )
                 .andExpect(status().isNotFound())
                 .andExpect(jsonPath("$.reason").exists())
                 .andExpect(jsonPath("$.reason").value("not found"));
+
+    }
+
+    @Test
+    @DisplayName("Session expired")
+    @WithMockUser("admin")
+    void loginSessionExpiredException() throws Exception {
+
+        when(gameEngineService.play(any(PlayGameRequestDto.class))).thenThrow(new LoginSessionExpiredException("Login Session Expired Exception"));
+
+        mockMvc.perform(
+                        MockMvcRequestBuilders.put("/" + MancalaConst.REQUEST_MAPPING + MancalaConst.PLAY)
+                                .content(new ObjectMapper().writeValueAsString(playGameRequestDto))
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .accept(MediaType.APPLICATION_JSON)
+                )
+                .andExpect(status().isUnauthorized())
+                .andExpect(jsonPath("$.reason").exists())
+                .andExpect(jsonPath("$.reason").value("Login Session Expired Exception"));
 
     }
 
@@ -181,7 +210,8 @@ class GameControllerTest {
         when(gameEngineService.play(any(PlayGameRequestDto.class))).thenThrow(new UnexpectedMoveException("not your turn"));
 
         mockMvc.perform(
-                        MockMvcRequestBuilders.put("/" + MancalaConst.REQUEST_MAPPING + MancalaConst.PLAY, "12", 5)
+                        MockMvcRequestBuilders.put("/" + MancalaConst.REQUEST_MAPPING + MancalaConst.PLAY)
+                                .content(new ObjectMapper().writeValueAsString(playGameRequestDto))
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .accept(MediaType.APPLICATION_JSON)
                 )
@@ -200,7 +230,8 @@ class GameControllerTest {
         when(gameEngineService.play(any(PlayGameRequestDto.class))).thenReturn(gameResponseDto);
 
         mockMvc.perform(
-                        MockMvcRequestBuilders.put("/" + MancalaConst.REQUEST_MAPPING + MancalaConst.PLAY, "12", 5)
+                        MockMvcRequestBuilders.put("/" + MancalaConst.REQUEST_MAPPING + MancalaConst.PLAY)
+                                .content(new ObjectMapper().writeValueAsString(playGameRequestDto))
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .accept(MediaType.APPLICATION_JSON)
                 )
@@ -209,4 +240,67 @@ class GameControllerTest {
                 .andExpect(jsonPath("$.winner").exists());
 
     }
+
+    @Test
+    @DisplayName("Internal server error")
+    @WithMockUser("admin")
+    void allOfExceptions() throws Exception {
+
+        when(gameEngineService.play(any(PlayGameRequestDto.class))).thenThrow(new NumberFormatException("Internal server error"));
+
+        mockMvc.perform(
+                        MockMvcRequestBuilders.put("/" + MancalaConst.REQUEST_MAPPING + MancalaConst.PLAY)
+                                .content(new ObjectMapper().writeValueAsString(playGameRequestDto))
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .accept(MediaType.APPLICATION_JSON)
+                )
+                .andExpect(status().isInternalServerError())
+                .andExpect(jsonPath("$.reason").exists())
+                .andExpect(jsonPath("$.reason").value("Internal server error"));
+
+    }
+
+    @Test
+    @DisplayName("AuthenticationException")
+    @WithMockUser("admin")
+    void authenticationException() throws Exception {
+
+        given(gameEngineService.play(any(PlayGameRequestDto.class))).willAnswer(invocation -> {
+            throw new AuthenticationException("bad credentials");
+        });
+
+        mockMvc.perform(
+                        MockMvcRequestBuilders.put("/" + MancalaConst.REQUEST_MAPPING + MancalaConst.PLAY)
+                                .content(new ObjectMapper().writeValueAsString(playGameRequestDto))
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .accept(MediaType.APPLICATION_JSON)
+                )
+                .andExpect(status().isUnauthorized())
+                .andExpect(jsonPath("$.reason").exists())
+                .andExpect(jsonPath("$.reason").value("bad credentials"));
+
+    }
+
+    @Test
+    @DisplayName("ConstraintViolationException")
+    @WithMockUser("admin")
+    void constraintViolationException() throws Exception {
+
+        ConstraintViolationException violationException = mock(ConstraintViolationException.class);
+        ConstraintViolationException exception = mock(ConstraintViolationException.class);
+        when(exception.getMessage()).thenReturn("violationException");
+        when(violationException.getCause()).thenReturn(exception);
+        when(gameEngineService.play(any(PlayGameRequestDto.class))).thenThrow(violationException);
+
+        mockMvc.perform(
+                        MockMvcRequestBuilders.put("/" + MancalaConst.REQUEST_MAPPING + MancalaConst.PLAY)
+                                .content(new ObjectMapper().writeValueAsString(playGameRequestDto))
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .accept(MediaType.APPLICATION_JSON)
+                )
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.reason").exists());
+
+    }
+
 }
