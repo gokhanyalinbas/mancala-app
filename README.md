@@ -29,6 +29,10 @@ Have Node.js and Docker installed on your computer.
 - [x] After built you can open applcation on your browser. 
 - [x] Frontend link :  http://localhost:3000/login
 
+If you have any problem with frontend deployment, you can use my heroku app to access UI :)
+https://mancalagame-gokhan.herokuapp.com
+
+
 -**Mongo DB**
 - [x] I have used mongo image from docker hub. If you want to use local mongo db, just change datasourceUrl in applicaiton.properties at springboot application.
 - [x] pull mongo image from docker hub **`docker pull mongo:latest`**
