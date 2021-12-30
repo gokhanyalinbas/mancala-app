@@ -29,7 +29,7 @@ Have Node.js and Docker installed on your computer.
 - [x] After built you can open applcation on your browser. 
 - [x] Frontend link :  http://localhost:3000/login
 
-If you have any problem with frontend deployment, you can use my heroku app to access UI :)
+If you have any problem with frontend deployment, you can use my heroku app to access UI :) Applicaiton can be on idle state, please try two or three times.
 https://mancalagame-gokhan.herokuapp.com
 
 
