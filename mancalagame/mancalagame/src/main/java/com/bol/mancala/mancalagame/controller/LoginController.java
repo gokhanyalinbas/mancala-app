@@ -10,14 +10,12 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.DisabledException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.context.annotation.RequestScope;
 
 import javax.naming.AuthenticationException;
+import javax.validation.Valid;
 
 @RestController
-@RequestScope
 @RequestMapping(MancalaConst.LOGIN)
 @CrossOrigin
 public class LoginController {
@@ -27,12 +25,12 @@ public class LoginController {
     private JwtTokenProvider jwtTokenProvider;
 
     @PostMapping
-    public ResponseEntity<?> signin(@RequestBody @Validated WebUserDto webuser) throws AuthenticationException {
+    public ResponseEntity<?> signIn(@RequestBody @Valid WebUserDto webUser) throws AuthenticationException {
         try {
             UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(
-                    webuser.getUsername(), webuser.getPassword());
+                    webUser.getUsername(), webUser.getPassword());
             authMngr.authenticate(authToken);
-            return ResponseEntity.ok(new JwtTokenResponse(jwtTokenProvider.createToken(webuser.getUsername())));
+            return ResponseEntity.ok(new JwtTokenResponse(jwtTokenProvider.createToken(webUser.getUsername())));
         } catch (DisabledException e) {
             throw new AuthenticationException("USER_DISABLED " + e.getMessage());
         } catch (BadCredentialsException e) {

@@ -36,8 +36,7 @@ public class GameEngineUtil {
     }
 
     public static MancalaGame lastPitControl(MancalaGame game, Pit lastStonePit) {
-        if (!lastStonePit.isBigPit() && lastStonePit.getCurrentTurn() == game.getTurn()
-                && lastStonePit.getStoneCount() == ONE) {
+        if (isLastPit(game, lastStonePit)) {
 
             int playerBigPitIndex = lastStonePit.getId() < MancalaConst.PLAYER_A_PIT_BIG_PIT ? MancalaConst.PLAYER_A_PIT_BIG_PIT : MancalaConst.PLAYER_B_PIT_BIG_PIT;
             Pit oppositePit = game.getGameBoard().getPit(MancalaConst.LAST_PIT - lastStonePit.getId());
@@ -45,6 +44,11 @@ public class GameEngineUtil {
             game = processLastPit(game, lastStonePit, playerBigPitIndex, oppositePit, bigPit);
         }
         return game;
+    }
+
+    private static boolean isLastPit(MancalaGame game, Pit lastStonePit) {
+        return !lastStonePit.isBigPit() && lastStonePit.getCurrentTurn() == game.getTurn()
+                && lastStonePit.getStoneCount() == ONE;
     }
 
     public static MancalaGame processLastPit(MancalaGame game, Pit lastStonePit, int playerBigPitIndex, Pit oppositePit, Pit bigPit) {

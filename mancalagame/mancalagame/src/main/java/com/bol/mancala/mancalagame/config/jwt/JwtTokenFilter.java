@@ -24,19 +24,20 @@ import java.util.function.Function;
 
 public class JwtTokenFilter extends GenericFilterBean {
     private static final String BEARER = "Bearer";
-    private final String secret;
+    private final String SECRET;
+    private final String AUTHORIZATION = "Authorization";
     private final UserDetailsService userDetailsService;
 
-    public JwtTokenFilter(UserDetailsService userDetailsService, String secret) {
+    public JwtTokenFilter(UserDetailsService userDetailsService, String SECRET) {
         this.userDetailsService = userDetailsService;
-        this.secret = Base64.getEncoder().encodeToString(secret.getBytes());
+        this.SECRET = Base64.getEncoder().encodeToString(SECRET.getBytes());
     }
 
     @Override
     public void doFilter(ServletRequest req, ServletResponse res, FilterChain filterChain)
             throws IOException, ServletException {
         System.err.println("doFilter()");
-        String headerValue = ((HttpServletRequest) req).getHeader("Authorization");
+        String headerValue = ((HttpServletRequest) req).getHeader(AUTHORIZATION);
         try {
             getBearerToken(headerValue).ifPresent(token -> {
                 String username = getClaimFromToken(token, Claims::getSubject);
@@ -68,7 +69,7 @@ public class JwtTokenFilter extends GenericFilterBean {
     }
 
     private <T> T getClaimFromToken(String token, Function<Claims, T> claimsResolver) {
-        final Claims claims = Jwts.parser().setSigningKey(secret).parseClaimsJws(token).getBody();
+        final Claims claims = Jwts.parser().setSigningKey(SECRET).parseClaimsJws(token).getBody();
         return claimsResolver.apply(claims);
     }
 

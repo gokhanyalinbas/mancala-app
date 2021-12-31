@@ -32,7 +32,7 @@ public class MancalaGame {
     public MancalaGame(Player playerA, Player playerB) {
         this.playerA = playerA;
         this.playerB = playerB;
-        //Firs turn for player A
+        //Firs turn is player A
         this.turn = Turn.PlayerA;
         this.gameBoard = new GameBoard(IntStream.range(MancalaConst.FIRST_PIT, MancalaConst.LAST_PIT + 1)
                 .mapToObj(i -> new Pit(i, MancalaConst.DEFAULT_STONE_COUNT))

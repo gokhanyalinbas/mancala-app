@@ -33,7 +33,6 @@ public class GameEngineServiceImpl implements GameEngineService {
     }
 
     private MancalaGame sow(MancalaGame game, Pit currentPit) {
-        // Check rules
         applyRules(game, currentPit);
         return distributeAllStones(game, currentPit);
     }

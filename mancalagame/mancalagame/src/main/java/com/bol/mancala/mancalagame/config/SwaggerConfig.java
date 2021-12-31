@@ -31,14 +31,6 @@ public class SwaggerConfig implements WebMvcConfigurer {
 
     private static final String SECURITY_SCHEME_NAME = "Bearer oAuth Token";
 
-    /**
-     * Open API Configuration Bean
-     *
-     * @param title
-     * @param version
-     * @param description
-     * @return
-     */
     @Bean
     public OpenAPI openApiConfiguration(
     ) {

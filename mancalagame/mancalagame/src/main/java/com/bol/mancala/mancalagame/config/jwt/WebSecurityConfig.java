@@ -1,5 +1,6 @@
 package com.bol.mancala.mancalagame.config.jwt;
 
+import com.bol.mancala.mancalagame.constant.MancalaConst;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
@@ -40,7 +41,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     protected void configure(HttpSecurity http) throws Exception {
         System.out.println("configurating security...");
 
-        http.csrf().disable().authorizeRequests().antMatchers("/login").permitAll().anyRequest().authenticated().and()
+        http.csrf().disable().authorizeRequests().antMatchers("/" + MancalaConst.LOGIN).permitAll().anyRequest().authenticated().and()
                 .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
 
         http.addFilterBefore(new JwtTokenFilter(userDetailsService, secret),
@@ -68,7 +69,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     }
 
     @Override
-    public void configure(WebSecurity web) throws Exception {
+    public void configure(WebSecurity web) {
         web.ignoring().antMatchers("/v3/api-docs/**");
         web.ignoring().antMatchers("/api-docs/**");
         web.ignoring().antMatchers("/swagger.json");
@@ -79,7 +80,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
         web.ignoring()
                 .antMatchers(
                         HttpMethod.POST,
-                        "/login"
+                        "/" + MancalaConst.LOGIN
                 )
                 .antMatchers(HttpMethod.OPTIONS, "/**");
 
