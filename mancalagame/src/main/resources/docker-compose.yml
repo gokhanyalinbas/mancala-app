@@ -1,0 +1,20 @@
+version: "3"
+services:
+  mancalamongodb:
+    image: mongo:latest
+    container_name: "mancalamongodb"
+    ports:
+      - 27017:27017
+  mancala-game:
+    image: mancala-game
+    container_name: mancala-game
+    ports:
+      - 8085:8085
+    links:
+      - mancalamongodb
+  mancala-ui:
+    image: mancala-ui
+    container_name: mancala-ui-container
+    ports:
+      - 3000:3000
+    tty: true
